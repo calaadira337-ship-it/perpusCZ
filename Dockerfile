@@ -46,14 +46,19 @@ WORKDIR /var/www/html
 # --- Copy project (respects .dockerignore) -----------------------------
 COPY . /var/www/html
 
-# --- Create .env and generate APP_KEY for build-time needs -------------
-# This .env will be overwritten or merged at runtime by start.sh,
-# but the build process (npm run build, artisan package:discover) needs it.
-RUN cp .env.example .env \
-    && php artisan key:generate --force
+# --- Create .env (placeholder untuk build-time) ------------------------
+# Env dari Railway menimpa isi .env saat runtime (dotenv immutable),
+# jadi nilai di sini hanya dipakai oleh perintah build.
+RUN cp .env.example .env
 
 # --- PHP dependencies (production) ------------------------------------
+# WAJIB sebelum perintah `php artisan ...` apa pun, karena artisan
+# membutuhkan vendor/autoload.php (vendor/ dikecualikan .dockerignore).
 RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# --- APP_KEY untuk kebutuhan build-time -------------------------------
+# Dijalankan SETELAH composer install (memerlukan vendor/).
+RUN php artisan key:generate --force
 
 # --- Frontend assets (Vite) -------------------------------------------
 RUN npm install && npm run build
