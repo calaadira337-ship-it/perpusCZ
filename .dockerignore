@@ -1,0 +1,81 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# IDE / Editor
+.idea/
+.vscode/
+.cursor/
+.nova/
+.zed/
+.phpactor.json
+.phpunit.cache/
+.phpunit.result.cache
+
+# Dependencies (reinstalled during build)
+vendor/
+node_modules/
+
+# Build artifacts (regenerated during build)
+/public/build/
+/public/hot
+/public/fonts-manifest.dev.json
+
+# Storage symlinks & cache (regenerated at runtime)
+/public/storage
+storage/*.key
+storage/pail/
+storage/framework/views/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/logs/*
+
+# Bootstrap cache (regenerated)
+bootstrap/cache/*.php
+bootstrap/cache/*.json
+
+# Environment files (not needed in image — provided at runtime)
+.env
+.env.backup
+.env.production
+.env.testing
+
+# Git worktrees
+.kilo/
+
+# Debug artifacts
+beranda.html
+*.log
+*.txt
+audit_final.php
+audit_final.txt
+cj_final.txt
+cj_min.txt
+comprehensive_test.php
+dbg.txt
+dbg_curl.php
+final_check.txt
+migrate_output.txt
+mstatus.txt
+pass_check.txt
+php_test.txt
+rlist.txt
+smk_err.txt
+smoke_final.php
+smoke_out.txt
+smoke_raw.txt
+smoke_result.txt
+smoke_stdout.txt
+test_minimal.txt
+test_output2.txt
+test_results.txt
+verify_db.php
+
+# OS
+.DS_Store
+Thumbs.db
