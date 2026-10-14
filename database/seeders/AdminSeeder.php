@@ -10,33 +10,30 @@ use Illuminate\Support\Facades\Hash;
 /**
  * Seeder idempotent: aman dijalankan berulang.
  * Tidak menghapus / menimpa data yang sudah ada.
+ *
+ * CATATAN DEPLOY: `start.sh` menjalankan `db:seed` setiap container start.
+ * Karena itu password akun HANYA di-set saat akun baru dibuat — password
+ * yang sudah diubah pengguna TIDAK boleh ditimpa setiap restart.
  */
 class AdminSeeder extends Seeder
 {
     public function run(): void
     {
         // ================= AKUN ADMIN =================
-        User::updateOrCreate(
-            ['username' => 'admin'],
-            [
-                'nama_lengkap' => 'Administrator',
-                'email' => 'admin@perpus.test',
-                'password' => Hash::make('admin123'),
-                'role' => 'admin',
-                'status' => 'aktif',
-            ]
-        );
+        $this->upsertUser('admin', [
+            'nama_lengkap' => 'Administrator',
+            'email' => 'admin@perpus.test',
+            'role' => 'admin',
+            'status' => 'aktif',
+        ], 'admin123');
+
         // ================= AKUN ADMIN 2 =================
-User::updateOrCreate(
-    ['username' => 'admin2'],
-    [
-        'nama_lengkap' => 'Julia Wanda',
-        'email' => 'juliawanda@gmail.com',
-        'password' => Hash::make('admin123'),
-        'role' => 'admin',
-        'status' => 'aktif',
-    ]
-);
+        $this->upsertUser('admin2', [
+            'nama_lengkap' => 'Julia Wanda',
+            'email' => 'juliawanda@gmail.com',
+            'role' => 'admin',
+            'status' => 'aktif',
+        ], 'admin123');
 
         // ================= CONTOH BUKU =================
         if (Buku::count() === 0) {
@@ -87,5 +84,30 @@ User::updateOrCreate(
                 Buku::create($b);
             }
         }
+    }
+
+    /**
+     * Buat user bila belum ada; JANGAN menimpa data yang sudah ada.
+     * Password hanya diberikan saat pembuatan akun baru.
+     */
+    private function upsertUser(string $username, array $attributes, string $password): User
+    {
+        $user = User::firstOrNew(['username' => $username]);
+
+        if (! $user->exists) {
+            $user->fill($attributes);
+            $user->password = Hash::make($password);
+        } else {
+            // Hanya isi kolom yang masih kosong; jangan timpa perubahan pengguna.
+            foreach ($attributes as $key => $value) {
+                if (blank($user->{$key})) {
+                    $user->{$key} = $value;
+                }
+            }
+        }
+
+        $user->save();
+
+        return $user;
     }
 }
